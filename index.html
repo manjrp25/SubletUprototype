@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SubletU – clickable prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--page:#E9E8E4;--phone:#FFFFFF;--ink:#161616;--soft:#5E5E5E;--faint:#8A8A8A;--line:#D2D2CE;--fill:#F1F1EF;--ph:#E2E2DE;--btn:#161616;--btnink:#FFFFFF;--red:#D7261E;--warn:#FFF4D1;--warnline:#E7C766;--ok:#1E6B45;--okbg:#E3F1E8;--shadow:0 30px 60px -30px rgba(0,0,0,.35);color-scheme:light;
+--ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#121212;--phone:#1C1C1C;--ink:#ECECEC;--soft:#B0B0B0;--faint:#8C8C8C;--line:#383838;--fill:#262626;--ph:#2E2E2E;--btn:#ECECEC;--btnink:#141414;--red:#FF5A4F;--warn:#3A3220;--warnline:#8C7330;--ok:#7FD3A3;--okbg:#1E3328;--shadow:0 30px 60px -30px rgba(0,0,0,.8);color-scheme:dark}}
+:root[data-theme="dark"]{--page:#121212;--phone:#1C1C1C;--ink:#ECECEC;--soft:#B0B0B0;--faint:#8C8C8C;--line:#383838;--fill:#262626;--ph:#2E2E2E;--btn:#ECECEC;--btnink:#141414;--red:#FF5A4F;--warn:#3A3220;--warnline:#8C7330;--ok:#7FD3A3;--okbg:#1E3328;--shadow:0 30px 60px -30px rgba(0,0,0,.8);color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.45 var(--ui)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.stage{display:grid;grid-template-columns:minmax(220px,300px) auto minmax(260px,330px);gap:36px;justify-content:center;align-items:start;padding:32px 24px 48px;max-width:1180px;margin:0 auto}
+.intro h1{font-size:1.5rem;line-height:1.2;margin:0 0 6px}
+.intro p{color:var(--soft);margin:0 0 12px;font-size:.93rem}
+.intro .task{border-left:3px solid var(--red);padding:8px 12px;background:var(--phone);border-radius:0 6px 6px 0;font-size:.9rem;color:var(--ink)}
+.intro .team{font-size:.82rem;color:var(--faint);margin-top:14px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{border:1px solid var(--line);background:var(--phone);padding:6px 11px;border-radius:999px;font-size:.84rem}
+.chip[aria-pressed="true"]{border-color:var(--red);color:var(--red);font-weight:600}
+.phone{width:390px;height:800px;background:var(--phone);border:10px solid #0F0F0F;border-radius:46px;box-shadow:var(--shadow);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.status{display:flex;justify-content:space-between;padding:10px 22px 4px;font:600 .78rem var(--ui)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 14px 10px;border-bottom:1px solid var(--line);min-height:44px}
+.topbar h2{font-size:1rem;margin:0;flex:1;text-align:center}
+.icon{background:none;border:none;padding:6px 8px;border-radius:8px;font-size:1.05rem;min-width:36px}
+.icon.txt{font-size:.82rem;font-weight:600}
+.screen{flex:1;overflow-y:auto;padding:16px 16px 20px;position:relative}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);padding:8px 4px 12px;background:var(--phone)}
+.tab{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.7rem;color:var(--faint);position:relative}
+.tab .sq{width:18px;height:18px;border:1.6px solid currentColor;border-radius:4px}
+.tab[aria-current="page"]{color:var(--ink);font-weight:600}
+.tab[aria-current="page"] .sq{background:currentColor}
+.tab .dot{position:absolute;top:-2px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:var(--red)}
+label.f{display:block;font-size:.78rem;color:var(--soft);margin:14px 0 5px}
+input.t{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--phone)}
+input.t:focus{border-color:var(--ink);outline:none}
+.err{color:var(--red);font-size:.8rem;margin-top:5px;min-height:1em}
+.hint{font-size:.76rem;color:var(--faint);margin-top:5px}
+.btn{display:block;width:100%;padding:13px;border-radius:12px;border:1.5px solid var(--btn);background:var(--btn);color:var(--btnink);font-weight:600;margin-top:16px}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hero{text-align:center;margin:26px 0 6px}
+.hero b{display:block;font-size:1.35rem;line-height:1.25}
+.hero span{font-size:.82rem;color:var(--faint)}
+.why{margin-top:22px;background:var(--fill);border-radius:10px;padding:12px;font-size:.82rem;color:var(--soft)}
+.range{width:100%;accent-color:var(--ink)}
+.rlab{display:flex;justify-content:space-between;font-size:.78rem;color:var(--soft)}
+.rlab b{color:var(--ink)}
+.sum{display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-size:.82rem}
+.sum button{background:none;border:none;font-weight:700;padding:0}
+.card{width:100%;text-align:left;background:none;border:1.5px solid var(--line);border-radius:14px;padding:10px;margin-top:12px;display:block}
+.card:hover{border-color:var(--ink)}
+.ph{background:var(--ph);border-radius:10px;height:120px;position:relative;overflow:hidden}
+.ph::before,.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent calc(50% - 1px),var(--line) 50%,transparent calc(50% + 1px))}
+.ph::after{background:linear-gradient(to top left,transparent calc(50% - 1px),var(--line) 50%,transparent calc(50% + 1px))}
+.ph.big{height:200px;border-radius:0;margin:-16px -16px 0}
+.badges{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:1;flex-wrap:wrap}
+.badge{background:var(--phone);border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:.7rem;font-weight:600}
+.badge.ok{color:var(--ok);border-color:var(--ok)}
+.price{font-weight:700;font-size:1.05rem;margin-top:8px}
+.meta{font-size:.8rem;color:var(--soft)}
+.sec{font-size:.78rem;color:var(--faint);margin:20px 0 0;text-transform:uppercase;letter-spacing:.05em}
+.near{border:1.5px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:.84rem;width:100%;text-align:left;background:none;display:block}
+.near small{color:var(--red)}
+.counter{text-align:center;font-size:.74rem;color:var(--faint);margin:6px 0 10px}
+.box{border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;font-size:.86rem}
+.box.fill{background:var(--fill);border-color:transparent}
+.box h3{margin:0 0 4px;font-size:.9rem}
+.check{color:var(--ok);font-weight:600}
+.tot{display:flex;justify-content:space-between;font-size:.85rem;margin-top:12px}
+.msgs{display:flex;flex-direction:column;gap:9px}
+.bub{max-width:80%;padding:9px 12px;border-radius:14px;font-size:.86rem}
+.bub.me{align-self:flex-end;background:var(--btn);color:var(--btnink);border-bottom-right-radius:4px}
+.bub.them{align-self:flex-start;background:var(--fill);border-bottom-left-radius:4px}
+.bub a{color:inherit}
+.warnb{background:var(--warn);border:1px solid var(--warnline);border-radius:10px;padding:9px 11px;font-size:.8rem}
+.composer{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+.composer input{flex:1;border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;background:var(--phone)}
+.composer button{border:none;background:var(--btn);color:var(--btnink);border-radius:999px;padding:0 16px;font-weight:600}
+.emailnote{font-size:.72rem;color:var(--faint);text-align:center;padding:0 12px 4px}
+.line{display:flex;justify-content:space-between;font-size:.86rem;padding:3px 0}
+.line.b{font-weight:700;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.thumb{display:flex;gap:10px;align-items:center}
+.thumb .ph{width:56px;height:56px;flex:none;border-radius:8px}
+.cb{display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:.84rem}
+.cb input{margin-top:3px;width:17px;height:17px;accent-color:var(--ink)}
+.cb a{color:var(--soft)}
+.pay{display:flex;justify-content:space-between;align-items:center}
+.banner{background:var(--okbg);color:var(--ok);border-radius:10px;padding:10px 12px;font-size:.84rem}
+.banner b{display:block}
+.banner.hold{background:var(--warn);color:var(--ink)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);margin:18px 0 6px;position:relative}
+.steps::before{content:"";position:absolute;top:8px;left:12%;right:12%;height:2px;background:var(--line)}
+.step{text-align:center;font-size:.68rem;color:var(--faint);position:relative}
+.step i{display:block;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);background:var(--phone);margin:0 auto 5px}
+.step.done{color:var(--ink);font-weight:600}
+.step.done i{background:var(--ink);border-color:var(--ink)}
+.step.hold i{background:var(--warnline);border-color:var(--warnline)}
+.small{font-size:.76rem;color:var(--faint);text-align:center;margin-top:6px}
+.modalwrap{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:20}
+.modal{background:var(--phone);width:100%;border-radius:20px 20px 0 0;padding:18px 16px 22px}
+.modal h3{margin:0 0 6px;font-size:1.02rem}
+.modal p{margin:0;color:var(--soft);font-size:.86rem}
+.opt{display:flex;gap:8px;align-items:center;font-size:.86rem;padding:7px 0}
+.toast{position:absolute;left:14px;right:14px;bottom:78px;background:var(--btn);color:var(--btnink);padding:11px 14px;border-radius:12px;font-size:.84rem;z-index:30;transition:opacity .25s,transform .25s}
+.toast[hidden]{display:block;opacity:0;transform:translateY(8px);pointer-events:none}
+.finish{text-align:center;margin-top:18px}
+.finish .big{font-size:2.2rem}
+.notes h2{font:500 .8rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin:0 0 4px}
+.notes h3{font-size:1.05rem;margin:0 0 12px}
+.notes ol{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.notes li{display:grid;grid-template-columns:24px 1fr;gap:8px;font-size:.9rem}
+.notes li span{width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;font:600 .75rem/22px var(--mono);text-align:center}
+.notes .flow{margin-top:22px;font-size:.8rem;color:var(--faint)}
+.notes .flow b{color:var(--ink)}
+.notesbtn{display:none}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:1060px){.stage{grid-template-columns:auto minmax(260px,340px)}.intro{grid-column:1/-1;max-width:740px}}
+@media (max-width:760px){
+ .stage{display:block;padding:0}
+ .intro{padding:16px 16px 10px}
+ .intro .task,.intro .team{display:none}
+ .phone{width:100%;height:100dvh;min-height:600px;border:none;border-radius:0;box-shadow:none;border-top:1px solid var(--line)}
+ .status{display:none}
+ .notes{display:none}
+ .notes.open{display:block;position:fixed;inset:auto 0 0 0;max-height:60vh;overflow:auto;background:var(--phone);padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);z-index:50}
+ .notesbtn{display:inline-block}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+ <section class="intro">
+  <h1>SubletU: clickable prototype</h1>
+  <p>Low-fidelity prototype of the core flow from Submission 7: verified Northeastern students find, vet, and book a sublet for their exact dates, with rent held in escrow until move-in.</p>
+  <div class="task"><b>Task:</b> Jordan is studying abroad. Book a verified sublet for Jan 4 – Apr 30, 2027 without seeing the unit in person.</div>
+  <div class="ctrl"><button class="chip" id="restart">Restart the flow</button><button class="chip notesbtn" id="notesBtn" aria-expanded="false">Screen notes</button></div>
+  <p class="team">Lila Keating, Pranav Manjrekar, Tanish Goli, Yuvraj Mehta · MISM</p>
+ </section>
+ <div class="phone" id="phone" aria-label="SubletU app prototype">
+  <div class="status" aria-hidden="true"><span>9:41</span><span>LTE ▮▮▯</span></div>
+  <div class="topbar" id="topbar"></div>
+  <main class="screen" id="screen"></main>
+  <div id="extra"></div>
+  <nav class="tabs" id="tabs" aria-label="App sections"></nav>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div id="modalRoot"></div>
+ </div>
+ <aside class="notes" id="notes" aria-live="polite"></aside>
+</div>
+<script>
+const NOTES={
+ signup:["Screen 1: Sign up",["Only .edu emails can register, and the address is confirmed with a code.","A single button creates the account.","A short line tells users why we require a school email."]],
+ verify:["Screen 1b: Email code",["The 6-digit code confirms the student owns the .edu address before they can search or list.","Prototype: any 6 digits work."]],
+ search:["Screen 2: Search",["Jordan enters his move-in and move-out dates.","He sets a maximum monthly rent.","He limits results to rooms near campus.","Search takes him to the results."]],
+ results:["Screen 3: Results",["Shows the current search; tap Edit to change it.","Rooms free for all of his dates are listed first, with a verified-host badge.","Rent, distance and dates are visible without opening the listing.","Rooms that only partly fit his dates are shown separately at the bottom."]],
+ listing:["Screen 4: Listing",["Report flags a suspicious listing for our team to review.","Shows that the host's ID and lease have been checked.","Room details and the walk to campus.","Request to book moves on to payment.","Message host opens the chat."]],
+ chat:["Screen 5: Chat with host",["A banner reminds users to pay only through SubletU.","The host sends a video link so Jordan can see the room from abroad.","Typing “Venmo” or “Zelle” shows a scam warning. Try it.","New messages are also sent by email."]],
+ pay:["Screen 6: Request and pay",["Total cost, including the 4% renter fee.","The first month's rent is held until Jordan moves in.","Payment is made by bank transfer through Stripe.","Jordan must accept the sublease terms first.","The request goes to the host, and Jordan is charged only if the host accepts."]],
+ bookings:["Screen 7: Booking and move-in",["Confirms the host accepted and the rent is being held.","Shows where the booking stands.","After moving in, Jordan taps here to release the rent to the host. The task is complete.","If something is wrong, he can report it and the rent stays held."]],
+ messages:["Messages",["All conversations stay on SubletU so payment warnings and reports work."]],
+ profile:["Profile",["Shows what has been verified: .edu email and MFA. Restart resets the prototype."]]
+};
+const LISTINGS=[
+ {id:"hunt",title:"Furnished room · 2BR · Huntington Ave",short:"Huntington Ave",rent:1050,dist:0.4,walk:8,from:"2027-01-04",to:"2027-04-30",host:"Sam R.",cls:"'27",details:["Private room · 1 roommate · furnished","Heat + Wi-Fi included · laundry in unit"],photos:8},
+ {id:"mish",title:"Sunny room · 3BR · Mission Hill",short:"Mission Hill",rent:975,dist:0.8,walk:16,from:"2027-01-02",to:"2027-05-03",host:"Priya K.",cls:"'26",details:["Private room · 2 roommates · furnished","Utilities split · laundry in building"],photos:6},
+ {id:"back",title:"Room in 2BR · Back Bay",short:"Back Bay",rent:1080,dist:0.9,walk:18,from:"2027-01-04",to:"2027-04-15",host:"Marcus T.",cls:"'27",details:["Private room · 1 roommate","Heat included · no laundry"],photos:5},
+ {id:"fen",title:"Furnished room · Fenway",short:"Fenway",rent:1000,dist:0.6,walk:12,from:"2027-01-15",to:"2027-04-30",host:"Dana L.",cls:"'26",details:["Private room · 2 roommates · furnished","Heat + Wi-Fi included"],photos:7},
+ {id:"sym",title:"Studio · Symphony",short:"Symphony",rent:1350,dist:0.3,walk:6,from:"2027-01-01",to:"2027-05-01",host:"Lee W.",cls:"'25",details:["Entire studio · furnished"],photos:9},
+ {id:"rox",title:"Room in 4BR · Roxbury",short:"Roxbury",rent:900,dist:1.7,walk:34,from:"2027-01-03",to:"2027-05-02",host:"Ana P.",cls:"'27",details:["Private room · 3 roommates"],photos:4}
+];
+const initial=()=>({view:"signup",email:"",code:"",from:"2027-01-04",to:"2027-04-30",budget:1100,dist:1.0,sel:"hunt",chat:null,booking:null,terms:false,history:[]});
+let S=initial();
+const $=s=>document.querySelector(s);
+const fmtD=d=>{const x=new Date(d+"T12:00:00");return x.toLocaleDateString("en-US",{month:"short",day:"numeric"})};
+const fmtDY=d=>{const x=new Date(d+"T12:00:00");return x.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})};
+const money=n=>"$"+n.toLocaleString("en-US");
+const days=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const months=()=>Math.max(1,Math.round(days(S.from,S.to)/30.4));
+const L=()=>LISTINGS.find(l=>l.id===S.sel);
+function esc(t){return t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function go(v,push=true){if(push&&S.view!==v)S.history.push(S.view);S.view=v;render();$("#screen").scrollTop=0}
+function back(){const v=S.history.pop()||"search";S.view=v;render()}
+let toastT;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600)}
+function modal(html,wire){const r=$("#modalRoot");r.innerHTML=`<div class="modalwrap" role="dialog" aria-modal="true"><div class="modal">${html}</div></div>`;r.querySelector('.modalwrap').addEventListener('click',e=>{if(e.target.classList.contains('modalwrap'))r.innerHTML=''});wire(r);const f=r.querySelector('button,input');if(f)f.focus()}
+function closeModal(){$("#modalRoot").innerHTML=""}
+function hdr(title,{backBtn=false,right=""}={}){$("#topbar").innerHTML=`${backBtn?'<button class="icon" id="bk" aria-label="Back">‹</button>':'<span style="min-width:36px"></span>'}<h2>${title}</h2>${right||'<span style="min-width:36px"></span>'}`;if(backBtn)$("#bk").onclick=back}
+const TABV={search:["search","results","listing","pay"],messages:["messages","chat"],bookings:["bookings"],profile:["profile"]};
+function tabs(show){const t=$("#tabs");if(!show){t.style.display="none";return}t.style.display="";const cur=Object.keys(TABV).find(k=>TABV[k].includes(S.view));
+ t.innerHTML=[["search","Search"],["messages","Messages"],["bookings","Bookings"],["profile","Profile"]].map(([k,l])=>`<button class="tab" data-t="${k}" ${cur===k?'aria-current="page"':''}><i class="sq"></i>${l}${k==="bookings"&&S.booking&&S.booking.status==="accepted"&&S.view!=="bookings"?'<span class="dot"></span>':''}</button>`).join("");
+ t.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{const k=b.dataset.t;S.history=[];go(k==="search"?"search":k,false)})}
+function notes(){const n=NOTES[S.view];$("#notes").innerHTML=`<h2>Annotations</h2><h3>${n[0]}</h3><ol>${n[1].map((x,i)=>`<li><span>${i+1}</span><div>${x}</div></li>`).join("")}</ol><p class="flow"><b>Flow:</b> Sign up → Email code → Search → Results → Listing → Chat → Request and pay → Booking and move-in</p>`}
+function render(){$("#extra").innerHTML="";closeModal();notes();const v=S.view;const sc=$("#screen");
+ if(v==="signup"){hdr("SubletU");tabs(false);
+  sc.innerHTML=`<div class="hero"><b>Sublets that match<br>your exact dates</b><span>Verified Northeastern students only</span></div>
+  <label class="f" for="em">Northeastern email (.edu)</label><input class="t" id="em" type="email" autocomplete="email" placeholder="you@northeastern.edu" value="${esc(S.email||"jrivera@northeastern.edu")}">
+  <div class="err" id="emErr"></div>
+  <label class="f" for="pw">Password</label><input class="t" id="pw" type="password" value="subletu2027" autocomplete="new-password">
+  <button class="btn" id="create">Create account</button>
+  <p class="small">Already a member? Log in</p>
+  <div class="why">Why .edu? Every member is a real student, so there are no anonymous posters like on Facebook or Instagram.</div>`;
+  $("#create").onclick=()=>{const e=$("#em").value.trim();if(!/^[^@\s]+@[^@\s]+\.edu$/i.test(e)){$("#emErr").textContent="Use your school email ending in .edu.";$("#em").focus();return}S.email=e;go("verify")};
+ }
+ else if(v==="verify"){hdr("Verify email",{backBtn:true});tabs(false);
+  sc.innerHTML=`<div class="hero"><b>Check your inbox</b><span>We sent a 6-digit code to ${esc(S.email)}</span></div>
+  <label class="f" for="cd">Verification code</label><input class="t" id="cd" inputmode="numeric" maxlength="6" placeholder="••••••" style="letter-spacing:.4em;font-size:1.2rem;text-align:center">
+  <div class="err" id="cdErr"></div><p class="hint">Prototype: any 6 digits work.</p>
+  <button class="btn" id="vf">Verify and continue</button>`;
+  $("#vf").onclick=()=>{const c=$("#cd").value.trim();if(!/^\d{6}$/.test(c)){$("#cdErr").textContent="Enter the 6-digit code.";return}S.history=[];go("search",false);toast("Email verified. Welcome to SubletU.")};
+ }
+ else if(v==="search"){hdr("Find housing");tabs(true);
+  sc.innerHTML=`<label class="f">Move-in → move-out</label><div class="row2"><input class="t" type="date" id="df" value="${S.from}" aria-label="Move-in date"><input class="t" type="date" id="dt" value="${S.to}" aria-label="Move-out date"></div>
+  <p class="hint">Only rooms free for your whole stay are shown first.</p><div class="err" id="dErr"></div>
+  <label class="f" for="bud">Monthly budget</label><input class="range" type="range" id="bud" min="600" max="2000" step="25" value="${S.budget}"><div class="rlab"><span>$600</span><b id="budL">up to ${money(S.budget)}</b></div>
+  <label class="f" for="ds">Distance to campus</label><input class="range" type="range" id="ds" min="0.2" max="3" step="0.1" value="${S.dist}"><div class="rlab"><span>Northeastern (Curry Center)</span><b id="dsL">within ${S.dist.toFixed(1)} mi</b></div>
+  <button class="btn" id="go">Search sublets</button>`;
+  $("#bud").oninput=e=>{S.budget=+e.target.value;$("#budL").textContent="up to "+money(S.budget)};
+  $("#ds").oninput=e=>{S.dist=+e.target.value;$("#dsL").textContent=`within ${S.dist.toFixed(1)} mi`};
+  $("#go").onclick=()=>{const f=$("#df").value,t=$("#dt").value;if(!f||!t||days(f,t)<28){$("#dErr").textContent="Pick a move-out date at least 4 weeks after move-in.";return}S.from=f;S.to=t;go("results")};
+ }
+ else if(v==="results"){const pool=LISTINGS.filter(l=>l.rent<=S.budget&&l.dist<=S.dist+1e-9);
+  const full=pool.filter(l=>l.from<=S.from&&l.to>=S.to).sort((a,b)=>a.dist-b.dist);
+  const part=pool.filter(l=>!(l.from<=S.from&&l.to>=S.to)).map(l=>{const gap=Math.max(0,days(S.from,l.from))+Math.max(0,days(l.to,S.to));return{...l,gap}}).filter(l=>l.gap>0&&l.gap<=21);
+  hdr(`${full.length} sublet${full.length===1?"":"s"} match`);tabs(true);
+  sc.innerHTML=`<div class="sum"><span>${fmtD(S.from)}–${fmtD(S.to)} · ≤${money(S.budget)} · ${S.dist.toFixed(1)} mi</span><button id="ed">Edit</button></div>
+  ${full.length?full.map(l=>`<button class="card" data-id="${l.id}"><div class="ph"><div class="badges"><span class="badge ok">✓ Covers your dates</span><span class="badge">ID-verified host</span></div></div><div class="price">${money(l.rent)} / mo</div><div class="meta">${l.short} · ${l.dist} mi to campus</div><div class="meta">${fmtD(l.from)} – ${fmtD(l.to)} · Lease checked ✓</div></button>`).join(""):`<div class="box fill">No rooms cover every one of your dates with these filters. Try a higher budget or a longer distance.</div>`}
+  ${part.length?`<p class="sec">Near matches (miss a few days)</p>${part.map(l=>`<button class="near" data-id="${l.id}">${l.short} · ${money(l.rent)} · ${fmtD(l.from)} – ${fmtD(l.to)} <small>(${l.gap} days short)</small></button>`).join("")}`:""}`;
+  $("#ed").onclick=()=>go("search");sc.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{S.sel=b.dataset.id;S.chat=null;go("listing")});
+ }
+ else if(v==="listing"){const l=L();const m=months();const sub=m*l.rent;
+  hdr("Listing",{backBtn:true,right:'<button class="icon txt" id="rep">⚑ Report</button>'});tabs(true);
+  sc.innerHTML=`<div class="ph big"></div><p class="counter">1 / ${l.photos} photos</p>
+  <b style="font-size:1rem">${l.title}</b><div class="meta">${money(l.rent)}/mo · Available ${fmtD(l.from)} – ${fmtDY(l.to)}</div>
+  <div class="box fill"><h3>Host: ${l.host} · Northeastern ${l.cls}</h3><div class="check">✓ ID verified (Persona)</div><div class="check">✓ Lease + landlord approval checked by SubletU</div></div>
+  <div class="box"><h3>Details</h3>${l.details.map(d=>`<div>${d}</div>`).join("")}<div>${l.dist} mi (${l.walk} min walk) to campus</div></div>
+  <div class="tot"><span>${m} month${m>1?"s":""}</span><b>${money(sub)} + 4% service fee</b></div>
+  ${(l.from<=S.from&&l.to>=S.to)?"":`<div class="warnb" style="margin-top:10px">This room doesn't cover all of your dates (${fmtD(S.from)} – ${fmtD(S.to)}).</div>`}
+  <button class="btn" id="req">Request to book</button><button class="btn ghost" id="msg" style="margin-top:10px">Message host</button>`;
+  $("#req").onclick=()=>{S.terms=false;go("pay")};$("#msg").onclick=()=>go("chat");
+  $("#rep").onclick=()=>modal(`<h3>Report this listing</h3><p>Our trust and safety team reviews every report.</p>
+   ${["Asked me to pay outside SubletU","Photos don't match the place","Host doesn't seem to control the lease","Something else"].map((x,i)=>`<label class="opt"><input type="radio" name="r" ${i===0?"checked":""}> ${x}</label>`).join("")}
+   <button class="btn" id="rs">Submit report</button><button class="btn ghost" id="rc" style="margin-top:8px">Cancel</button>`,r=>{r.querySelector("#rs").onclick=()=>{closeModal();toast("Reported. Our team reviews it within 24 hours.")};r.querySelector("#rc").onclick=closeModal});
+ }
+ else if(v==="chat"||v==="messages"&&false){}
+ if(v==="chat"){const l=L();if(!S.chat)S.chat=[{w:"me",t:`Hi! Is it still free for ${fmtD(S.from)} – ${fmtD(S.to)}? I'm abroad, can't tour.`},{w:"them",t:`Yes! Here's a video walkthrough: <a href="#" onclick="return false">youtu.be/…</a>`}];
+  hdr(`${l.host} · ${l.short}`,{backBtn:true});tabs(true);
+  sc.innerHTML=`<div class="warnb">⚠ Keep payment in SubletU. Rent paid here is held until you move in. We will never ask you to pay by Zelle or Venmo.</div><div class="msgs" id="msgs" style="margin-top:12px"></div>`;
+  const draw=()=>{$("#msgs").innerHTML=S.chat.map(m=>m.w==="warn"?`<div class="warnb">⚠ ${m.t}</div>`:`<div class="bub ${m.w}">${m.t}</div>`).join("");sc.scrollTop=sc.scrollHeight};draw();
+  $("#extra").innerHTML=`<p class="emailnote">New messages are also sent to your email.</p><div class="composer"><input id="ci" placeholder="Type a message..." aria-label="Message"><button id="cs">Send</button></div>`;
+  const send=()=>{const i=$("#ci");const t=i.value.trim();if(!t)return;S.chat.push({w:"me",t:esc(t)});i.value="";
+   const bad=/venmo|zelle|cash\s?app|paypal|wire/i.test(t);
+   if(bad)S.chat.push({w:"warn",t:"Looks like you mentioned an outside payment app. Payments outside SubletU are not protected by escrow."});
+   draw();setTimeout(()=>{if(S.view!=="chat")return;S.chat.push({w:"them",t:bad?"Let's keep it on SubletU, go ahead and request.":"Sounds good! Feel free to send a request for your dates."});draw()},900)};
+  $("#cs").onclick=send;$("#ci").onkeydown=e=>{if(e.key==="Enter")send()};
+ }
+ else if(v==="messages"){hdr("Messages");tabs(true);const l=L();
+  sc.innerHTML=S.chat?`<button class="card" id="th"><b>${l.host} · ${l.short}</b><div class="meta">${S.chat[S.chat.length-1].t.replace(/<[^>]+>/g,"")}</div></button>`:`<div class="box fill">No conversations yet. Message a host from any listing.</div>`;
+  if(S.chat)$("#th").onclick=()=>go("chat");
+ }
+ else if(v==="pay"){const l=L();const m=months();const sub=m*l.rent,fee=Math.round(sub*0.04),due=l.rent+fee;
+  hdr("Request to book",{backBtn:true});tabs(false);
+  sc.innerHTML=`<div class="thumb"><div class="ph"></div><div><b>${l.short} room</b><div class="meta">${fmtD(S.from)} – ${fmtDY(S.to)}</div><div class="meta">Host: ${l.host} ✓</div></div></div>
+  <div class="box"><h3>Price</h3><div class="line"><span>${m} months × ${money(l.rent)}</span><span>${money(sub)}</span></div><div class="line"><span>SubletU service fee (4%)</span><span>${money(fee)}</span></div><div class="line b"><span>Due if accepted (month 1 + fee)</span><span>${money(due)}</span></div></div>
+  <div class="box fill"><h3>Held in escrow</h3>Month 1 rent is held by Stripe and only sent to the host after you confirm move-in. Months 2–${m} are billed monthly.</div>
+  <label class="f">Pay with</label><div class="box pay" style="margin-top:0"><span>Bank account (ACH) via Stripe ····4821</span><span class="meta">Change</span></div>
+  <label class="cb"><input type="checkbox" id="tm" ${S.terms?"checked":""}><span>I agree to the sublease terms<br><a href="#" onclick="return false">View landlord-approved lease</a> · <a href="#" onclick="return false">Escrow terms</a></span></label>
+  <button class="btn" id="sr" ${S.terms?"":"disabled"}>Send request · nothing charged yet</button>`;
+  $("#tm").onchange=e=>{S.terms=e.target.checked;$("#sr").disabled=!S.terms};
+  $("#sr").onclick=()=>{const b=$("#sr");b.disabled=true;b.innerHTML='<span class="spin"></span>Request sent · waiting for '+l.host.split(" ")[0];
+   S.booking={id:l.id,status:"requested",due,fee};setTimeout(()=>{S.booking.status="accepted";S.history=[];go("bookings",false);toast(`${l.host.split(" ")[0]} accepted. ${money(l.rent)} is held in escrow.`)},1800)};
+ }
+ else if(v==="bookings"){hdr("My bookings");tabs(true);
+  if(!S.booking){sc.innerHTML=`<div class="box fill">No bookings yet. Find a room in Search and send a request.</div>`;return}
+  const l=LISTINGS.find(x=>x.id===S.booking.id);const st=S.booking.status;const first=l.host.split(" ")[0];
+  const idx={requested:0,accepted:1,released:3,hold:1}[st];
+  const labels=["Requested","Host accepted",`Move-in ${fmtD(S.from)}`,"Rent released"];
+  sc.innerHTML=`${st==="accepted"?`<div class="banner"><b>${first} accepted! ${money(l.rent)} held in escrow.</b>We emailed you a receipt.</div>`:st==="released"?`<div class="banner"><b>Rent released to ${first}.</b>Enjoy the new place.</div>`:st==="hold"?`<div class="banner hold"><b>Problem reported. Rent stays held.</b>Our team will contact you and ${first} within 24 hours.</div>`:`<div class="banner hold"><b>Waiting for ${first} to accept.</b>Nothing has been charged yet.</div>`}
+  <div class="ph" style="margin-top:14px"></div><b style="display:block;margin-top:8px">${l.short} room</b><div class="meta">${fmtD(S.from)} – ${fmtDY(S.to)} · Host: ${l.host}</div>
+  <div class="steps">${labels.map((x,i)=>`<div class="step ${i<=idx?"done":""} ${st==="hold"&&i===2?"hold":""}"><i></i>${st==="hold"&&i===2?"On hold":x}</div>`).join("")}</div>
+  ${st==="released"?`<div class="finish"><div class="big">✓</div><b>Task complete</b><p class="meta">Jordan booked a verified sublet for his exact dates without seeing it in person.</p></div><button class="btn ghost" id="mh">Message host</button>`:
+  `<button class="btn" id="mi" ${st==="accepted"?"":"disabled"}>Confirm I've moved in</button><p class="small">Unlocks on your move-in date (unlocked for this demo)</p><div class="row2"><button class="btn ghost" id="mh" style="margin-top:10px">Message host</button><button class="btn ghost" id="rp" style="margin-top:10px" ${st==="hold"?"disabled":""}>Report a problem</button></div>`}`;
+  if($("#mh"))$("#mh").onclick=()=>{S.sel=l.id;go("chat")};
+  if($("#mi"))$("#mi").onclick=()=>modal(`<h3>Release rent to ${first}?</h3><p>Only confirm once you've moved in and the room matches the listing. ${money(l.rent)} will be sent from escrow.</p><button class="btn" id="ok">Yes, I've moved in</button><button class="btn ghost" id="no" style="margin-top:8px">Not yet</button>`,r=>{r.querySelector("#ok").onclick=()=>{S.booking.status="released";render();toast("Rent released. Booking complete.")};r.querySelector("#no").onclick=closeModal});
+  if($("#rp"))$("#rp").onclick=()=>modal(`<h3>Report a problem</h3><p>Your rent stays in escrow while we review.</p>${["Room doesn't match the listing","Can't get in / host not responding","Safety concern"].map((x,i)=>`<label class="opt"><input type="radio" name="p" ${i===0?"checked":""}> ${x}</label>`).join("")}<button class="btn" id="ps">Submit and hold rent</button><button class="btn ghost" id="pc" style="margin-top:8px">Cancel</button>`,r=>{r.querySelector("#ps").onclick=()=>{S.booking.status="hold";render();toast("Reported. Rent is on hold.")};r.querySelector("#pc").onclick=closeModal});
+ }
+ else if(v==="profile"){hdr("Profile");tabs(true);
+  sc.innerHTML=`<div class="box fill"><h3>Jordan Rivera</h3><div class="meta">${esc(S.email||"jrivera@northeastern.edu")}</div></div>
+  <div class="box"><div class="check">✓ .edu email verified</div><div class="check">✓ Multi-factor sign-in on</div><div class="meta" style="margin-top:6px">Renter ID check is planned for a later release.</div></div>
+  <button class="btn ghost" id="rs2">Restart prototype</button>`;$("#rs2").onclick=restart;
+ }
+}
+function restart(){S=initial();render();toast("Prototype restarted.")}
+$("#restart").onclick=restart;
+$("#notesBtn").onclick=()=>{const n=$("#notes");const o=n.classList.toggle("open");$("#notesBtn").setAttribute("aria-expanded",o)};
+document.addEventListener("click",e=>{const n=$("#notes");if(n.classList.contains("open")&&!n.contains(e.target)&&e.target.id!=="notesBtn"){n.classList.remove("open");$("#notesBtn").setAttribute("aria-expanded","false")}});
+render();
+</script>
+</body>
+</html>
